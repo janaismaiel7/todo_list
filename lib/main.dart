@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
       routes: {
         Homescreen.routeName:(context)=> Homescreen()
         },
+        theme: Mythemedata().lightTheme ,
+       
     );
   }
 }
