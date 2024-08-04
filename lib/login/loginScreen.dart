@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list/appColors.dart';
 import 'package:todo_list/dialogueUtilies.dart';
+import 'package:todo_list/home/homeScreen.dart';
 import 'package:todo_list/register/customTextFormField.dart';
 import 'package:todo_list/register/registerScreen.dart';
 
@@ -11,10 +12,10 @@ class Loginscreen extends StatelessWidget {
   static const String routeName = 'Login Screen';
 
   TextEditingController emailController =
-      TextEditingController(text: 'amira@route.con');
+      TextEditingController(text: 'jana.aismaiel@gmail.com');
 
   TextEditingController passwordController =
-      TextEditingController(text: 'dhajkdajkask');
+      TextEditingController(text: 'dhjhbvcjhkcj');
 
   var formKey = GlobalKey<FormState>();
 
@@ -126,6 +127,7 @@ class Loginscreen extends StatelessWidget {
                 email: emailController.text, password: passwordController.text);
         Dialogueutilies.hideLoading(context);
         Dialogueutilies.showMessage(content: 'Login Successful',context: context,title: 'Sucesss',posActionName: 'ok');
+          Navigator.of(context).pushNamed(Homescreen.routeName);
         print('login success');
 
         print(credential.user?.uid ?? '');

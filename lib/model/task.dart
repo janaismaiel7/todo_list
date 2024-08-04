@@ -16,6 +16,22 @@ class task {
       required this.dateTime,
       this.isDone = false});
 
+  task copyWith({
+    String? title,
+    String? descr,
+    DateTime? dateTime,
+    bool? isDone,
+  }) {
+    return task(
+      id: this.id,
+      title: title ?? this.title,
+      descr: descr ?? this.descr,
+      dateTime: dateTime ?? this.dateTime,
+      isDone: isDone ?? this.isDone,
+    );
+  }
+
+
 //json to object
   task.fromfireStore(Map<String, dynamic> data)
       : this(
