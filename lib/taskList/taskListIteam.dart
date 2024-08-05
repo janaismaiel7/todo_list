@@ -6,7 +6,6 @@ import 'package:todo_list/firebaseUtiles.dart';
 import 'package:todo_list/model/task.dart';
 import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/provider/listProvider.dart';
-import 'package:todo_list/taskList/DoneWidget.dart';
 import 'package:todo_list/taskList/editTaskBottomSheet.dart';
 
 class Tasklistitem extends StatelessWidget {
