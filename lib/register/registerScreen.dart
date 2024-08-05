@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/appColors.dart';
 import 'package:todo_list/dialogueUtilies.dart';
+import 'package:todo_list/firebaseUtiles.dart';
 import 'package:todo_list/home/homeScreen.dart';
+import 'package:todo_list/model/myUser.dart';
+import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/register/customTextFormField.dart';
 
 class Registerscreen extends StatelessWidget {
@@ -131,6 +135,15 @@ class Registerscreen extends StatelessWidget {
           email: emailController.text,
           password: passwordController.text,
         );
+        Myuser user = Myuser(
+            email: emailController.text,
+            id: credential.user?.uid ?? '',
+            name: UsernameConteroller.text);
+        var authprovider =
+            Provider.of<Authuserprovider>(context, listen: false);
+        authprovider.updateUser(user);
+        Firebaseutiles.addUserToFireStore(user);
+
         Dialogueutilies.hideLoading(context);
         Dialogueutilies.showMessage(
             context: context,
@@ -138,7 +151,7 @@ class Registerscreen extends StatelessWidget {
             title: 'Sucesss',
             posActionName: 'ok',
             posAction: () {
-              Navigator.of(context).pushNamed(Homescreen.routeName);
+              Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
             });
 
         print('succes');

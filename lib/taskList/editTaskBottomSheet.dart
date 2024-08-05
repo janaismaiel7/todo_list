@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_list/appColors.dart';
 import 'package:todo_list/firebaseUtiles.dart';
 import 'package:todo_list/model/task.dart';
+import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/provider/listProvider.dart';
 
 class Edittaskbottomsheet extends StatefulWidget {
@@ -30,6 +31,9 @@ class _EdittaskbottomsheetState extends State<Edittaskbottomsheet> {
   @override
   Widget build(BuildContext context) {
     listProvider = Provider.of<Listprovider>(context);
+  
+
+    
     return Container(
       margin: EdgeInsets.all(10),
       child: Column(
@@ -131,12 +135,12 @@ class _EdittaskbottomsheetState extends State<Edittaskbottomsheet> {
         descr: descr.isNotEmpty ? descr : widget.Task.descr,
         dateTime: selectedDate,
       );
-
-      Firebaseutiles.editTasktoFireStore(taskupdated).timeout(
+ var authProvider = Provider.of<Authuserprovider>(context,listen: false);
+      Firebaseutiles.editTasktoFireStore(taskupdated,authProvider.currentUser!.id).timeout(
         Duration(seconds: 1),
         onTimeout: () {
           print('Task edited succesfully');
-          listProvider.getAllTasksFromFireStore();
+          listProvider.getAllTasksFromFireStore(authProvider.currentUser!.id);
           Navigator.pop(context);
         },
       );

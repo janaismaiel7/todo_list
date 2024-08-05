@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/appColors.dart';
+import 'package:todo_list/login/loginScreen.dart';
+import 'package:todo_list/provider/authUserProvider.dart';
+import 'package:todo_list/provider/listProvider.dart';
 import 'package:todo_list/settings/settingsTab.dart';
 import 'package:todo_list/taskList/addTaskBottomSheet.dart';
 import 'package:todo_list/taskList/taskListTab.dart';
@@ -17,12 +21,23 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
+    var authProvider = Provider.of<Authuserprovider>(context);
+    var listProvider = Provider.of<Listprovider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'To Do List',
+          'To Do List {${authProvider.currentUser!.name}}',
           style: Theme.of(context).textTheme.titleLarge,
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                listProvider.taskList = [];
+                Navigator.of(context)
+                    .pushReplacementNamed(Loginscreen.routeName);
+              },
+              icon: Icon(Icons.logout))
+        ],
         backgroundColor: Appcolors.primaryColor,
         // toolbarHeight: MediaQuery.of(context).size.height*0.2,
       ),

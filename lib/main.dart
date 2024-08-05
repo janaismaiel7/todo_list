@@ -6,20 +6,30 @@ import 'package:todo_list/home/homeScreen.dart';
 import 'package:todo_list/login/loginScreen.dart';
 import 'package:todo_list/mythemedata.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/provider/listProvider.dart';
 import 'package:todo_list/register/registerScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   await FirebaseFirestore.instance.disableNetwork();
-  runApp(ChangeNotifierProvider(
+ await FirebaseFirestore.instance.enableNetwork();
+  runApp(MultiProvider(
+providers: [
+  ChangeNotifierProvider(create: (context)=>Listprovider()),
+  ChangeNotifierProvider(create: (context)=>Authuserprovider()),
+
+],
+child: MyApp(),
+
+
+
+
+  )
     
-    create: (context)=> Listprovider(),
-    child: MyApp()));
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list/firebaseUtiles.dart';
+import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/provider/listProvider.dart';
 import 'package:todo_list/taskList/taskListIteam.dart';
 
@@ -17,15 +19,24 @@ class _TasklisttabState extends State<Tasklisttab> {
   @override
   Widget build(BuildContext context) {
     var listProvider = Provider.of<Listprovider>(context);
+    var authProvider = Provider.of<Authuserprovider>(context);
     if (listProvider.taskList.isEmpty) {
-      listProvider.getAllTasksFromFireStore();
+      listProvider.getAllTasksFromFireStore(authProvider.currentUser!.id);
     }
+    List<task> donetasks =
+        listProvider.taskList.where((task) => task.isDone).toList();
+    List<task> notdoneTasks =
+        listProvider.taskList.where((task) => !task.isDone).toList();
+
+   
+
     return Column(
       children: [
         EasyDateTimeLine(
           initialDate: listProvider.selectDate,
           onDateChange: (selectedDate) {
-            listProvider.changeSelectDate(selectedDate);
+            listProvider.changeSelectDate(
+                selectedDate, authProvider.currentUser!.id);
           },
           headerProps: const EasyHeaderProps(
             monthPickerType: MonthPickerType.switcher,
@@ -49,13 +60,34 @@ class _TasklisttabState extends State<Tasklisttab> {
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return Tasklistiteam(t: listProvider.taskList[index]);
-            },
-            itemCount: listProvider.taskList.length,
-          ),
-        )
+            child: DefaultTabController(
+                length: 2,
+                child: Column(
+                  children: [
+                    TabBar(tabs: [
+                      Tab(
+                        text: 'Not Done',
+                      ),
+                      Tab(
+                        text: 'Done',
+                      )
+                    ]),
+                    Expanded(
+                        child: TabBarView(children: [
+                      ListView.builder(
+                        itemBuilder: (context, index) {
+                          return Tasklistitem(t: notdoneTasks[index]);
+                        },
+                        itemCount: notdoneTasks.length,
+                      ),
+                      ListView.builder(itemBuilder: (context, index) {
+                        return Tasklistitem(t: donetasks[index]);
+                      },
+                      itemCount: donetasks.length,
+                      )
+                    ]))
+                  ],
+                )))
       ],
     );
   }

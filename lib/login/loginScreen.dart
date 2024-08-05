@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/appColors.dart';
 import 'package:todo_list/dialogueUtilies.dart';
+import 'package:todo_list/firebaseUtiles.dart';
 import 'package:todo_list/home/homeScreen.dart';
+import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/register/customTextFormField.dart';
 import 'package:todo_list/register/registerScreen.dart';
 
@@ -65,11 +68,14 @@ class Loginscreen extends StatelessWidget {
                       keyboardType: TextInputType.emailAddress,
                       validator: (text) {
                         if (text == null || text.trim().isEmpty) {
-                          return 'please enter email';
+                          return 'Please enter email';
                         }
                         final bool emailValid = RegExp(
                                 r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                             .hasMatch(emailController.text);
+                        if (!emailValid) {
+                          return 'Please enter a valid email';
+                        }
                         return null;
                       },
                     ),
@@ -79,10 +85,10 @@ class Loginscreen extends StatelessWidget {
                       obscureText: true,
                       validator: (text) {
                         if (text == null || text.trim().isEmpty) {
-                          return 'please enter Password';
+                          return 'Please enter password';
                         }
                         if (text.length < 6) {
-                          return 'Password should be at least 6 chars';
+                          return 'Password should be at least 6 characters';
                         }
                         return null;
                       },
@@ -91,7 +97,7 @@ class Loginscreen extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                           style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(
+                              backgroundColor: MaterialStateProperty.all(
                                   Appcolors.primaryColor)),
                           onPressed: () {
                             login(context);
@@ -125,25 +131,55 @@ class Loginscreen extends StatelessWidget {
         final credential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
-        Dialogueutilies.hideLoading(context);
-        Dialogueutilies.showMessage(content: 'Login Successful',context: context,title: 'Sucesss',posActionName: 'ok');
-          Navigator.of(context).pushNamed(Homescreen.routeName);
-        print('login success');
+        var user = await Firebaseutiles.readUserFromFireStore(
+            credential.user?.uid ?? '');
 
-        print(credential.user?.uid ?? '');
+        if (user == null) {
+          Dialogueutilies.hideLoading(context);
+          Dialogueutilies.showMessage(
+              content: 'Failed to retrieve user data',
+              context: context,
+              title: 'Error',
+              posActionName: 'OK');
+          return;
+        }
+        var authprovider =
+            Provider.of<Authuserprovider>(context, listen: false);
+        authprovider.updateUser(user);
+        Dialogueutilies.hideLoading(context);
+        Dialogueutilies.showMessage(
+            content: 'Login Successful',
+            context: context,
+            title: 'Success',
+            posActionName: 'OK',
+            posAction: () {
+              Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
+            });
+        print('Login success');
       } on FirebaseAuthException catch (e) {
+        Dialogueutilies.hideLoading(context);
         if (e.code == 'invalid-credential') {
-            Dialogueutilies.hideLoading(context);
-        Dialogueutilies.showMessage(content: 'No user found for that email.',context: context,title: 'Error',posActionName: 'ok');
-          print('No user found for that email.');
+          Dialogueutilies.showMessage(
+              content: 'Invalid credentials.',
+              context: context,
+              title: 'Error',
+              posActionName: 'OK');
+          print('Invalid credentials.');
         } else if (e.code == 'wrong-password') {
-            Dialogueutilies.hideLoading(context);
-        Dialogueutilies.showMessage(content: 'Wrong password provided for that user.',context: context,title: 'Error',posActionName: 'ok');
-          print('Wrong password provided for that user.');
+          Dialogueutilies.showMessage(
+              content: 'Wrong password provided.',
+              context: context,
+              title: 'Error',
+              posActionName: 'OK');
+          print('Wrong password provided.');
         }
       } catch (e) {
-          Dialogueutilies.hideLoading(context);
-        Dialogueutilies.showMessage(content: e.toString(),context: context,title: 'Error',posActionName: 'ok');
+        Dialogueutilies.hideLoading(context);
+        Dialogueutilies.showMessage(
+            content: e.toString(),
+            context: context,
+            title: 'Error',
+            posActionName: 'OK');
         print(e.toString());
       }
     }
