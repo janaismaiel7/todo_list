@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/provider/listProvider.dart';
 import 'package:todo_list/register/registerScreen.dart';
+import 'package:todo_list/splashScreen/lightSplashScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,10 +41,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: Loginscreen.routeName,
-        routes: {Homescreen.routeName: (context) => Homescreen(),
+        initialRoute: Lightsplashscreen.routeName,
+        routes: {Lightsplashscreen.routeName:(context)=>Lightsplashscreen(),
+          Homescreen.routeName: (context) => Homescreen(),
         Registerscreen.routeName: (context) => Registerscreen(),
-                Loginscreen.routeName: (context) => Loginscreen()
+                Loginscreen.routeName: (context) => Loginscreen(),
+                
         },
         theme: Mythemedata.lightTheme);
   }

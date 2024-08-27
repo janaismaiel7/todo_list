@@ -8,18 +8,38 @@ import 'package:todo_list/home/homeScreen.dart';
 import 'package:todo_list/model/myUser.dart';
 import 'package:todo_list/provider/authUserProvider.dart';
 import 'package:todo_list/register/customTextFormField.dart';
+import 'package:todo_list/register/registerNagiator.dart';
+import 'package:todo_list/register/registerScreenViewModel.dart';
 
-class Registerscreen extends StatelessWidget {
+class Registerscreen extends StatefulWidget  {
   static const String routeName = 'register Screen';
+
+  @override
+  State<Registerscreen> createState() => _RegisterscreenState();
+}
+
+class _RegisterscreenState extends State<Registerscreen>implements Registernagiator {
   TextEditingController UsernameConteroller =
       TextEditingController(text: 'amira');
+
   TextEditingController emailController =
       TextEditingController(text: 'jana.aismaiel@gmail.com');
+
   TextEditingController passwordController =
       TextEditingController(text: 'dhjhbvcjhkcj');
-  TextEditingController confirmPassword =
+
+  TextEditingController confirmPassword =  
       TextEditingController(text: 'dhjhbvcjhkcj');
+
   var formKey = GlobalKey<FormState>();
+
+  Registerscreenviewmodel viewModel =Registerscreenviewmodel();
+
+  @override
+  void initState(){
+    super.initState();
+    viewModel.navigator=this;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,69 +148,27 @@ class Registerscreen extends StatelessWidget {
 
   void register(BuildContext context) async {
     if (formKey.currentState?.validate() == true) {
-      Dialogueutilies.showLoading(context, 'Loading');
-      try {
-        final credential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
-        Myuser user = Myuser(
-            email: emailController.text,
-            id: credential.user?.uid ?? '',
-            name: UsernameConteroller.text);
-        var authprovider =
-            Provider.of<Authuserprovider>(context, listen: false);
-        authprovider.updateUser(user);
-        Firebaseutiles.addUserToFireStore(user);
-
-        Dialogueutilies.hideLoading(context);
-        Dialogueutilies.showMessage(
-            context: context,
-            content: 'Register Successfull',
-            title: 'Sucesss',
-            posActionName: 'ok',
-            posAction: () {
-              Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
-            });
-
-        print('succes');
-        print(credential.user?.uid ?? '');
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          Dialogueutilies.hideLoading(context);
-          Dialogueutilies.showMessage(
-              context: context,
-              content: 'The password provided is too weak.',
-              title: 'Error',
-              posActionName: 'ok');
-          print('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          Dialogueutilies.hideLoading(context);
-          Dialogueutilies.showMessage(
-              context: context,
-              content: 'The account already exists for that email.',
-              title: 'error',
-              posActionName: 'ok');
-          print('The account already exists for that email.');
-        } else if (e.code == 'network') {
-          Dialogueutilies.hideLoading(context);
-          Dialogueutilies.showMessage(
-              context: context,
-              content: 'The account already exists for that email.',
-              title: 'error',
-              posActionName: 'ok');
-          print('The account already exists for that email.');
-        }
-      } catch (e) {
-        Dialogueutilies.hideLoading(context);
-        Dialogueutilies.showMessage(
-            context: context,
-            content: e.toString(),
-            title: 'Error',
-            posActionName: 'ok');
-        print(e);
-      }
+      viewModel.register(emailController.text, passwordController.text);
+     
     }
+  }
+
+  @override
+  void hideMyLoading() {
+    // TODO: implement hideMyLoading
+    Dialogueutilies.hideLoading(context);
+  }
+
+  @override
+  void showMyLoading(String message) {
+    // TODO: implement showMyLoading
+  Dialogueutilies.showLoading(context,message);
+  }
+
+  @override
+  void showMyMessage(String message) {
+    // TODO: implement showMyMessage
+    Dialogueutilies.showMessage(context: context, content: message,posActionName: 'Ok');
+   
   }
 }
